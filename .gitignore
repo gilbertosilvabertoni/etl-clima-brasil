@@ -1,0 +1,13 @@
+# Nunca versionar dados sensíveis
+.env
+
+# Dados brutos (opcional, depende da política do time)
+data/raw/
+
+# Cache Python
+__pycache__/
+*.pyc
+
+# Ambientes virtuais
+venv/
+.venv/
