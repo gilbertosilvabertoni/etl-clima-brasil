@@ -11,3 +11,13 @@ __pycache__/
 # Ambientes virtuais
 venv/
 .venv/
+
+# Credenciais do banco
+docker/.env.db
+
+# Volume do PostgreSQL
+docker/pgdata/
+
+# Abra o .gitignore e adicione ao final
+echo ".agents" >> .gitignore
+echo ".codex" >> .gitignore
