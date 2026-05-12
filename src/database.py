@@ -11,13 +11,17 @@ load_dotenv("docker/.env.db")
 def get_connection():
     """
     Retorna uma conexão com o PostgreSQL.
+    Dentro do Docker usa o nome do container, fora usa localhost.
     """
+    host = os.getenv("POSTGRES_HOST", "localhost")
+    port = int(os.getenv("POSTGRES_PORT", "5432"))
+
     return psycopg2.connect(
-        host="localhost",
-        port=5433,
-        dbname="clima_brasil",
-        user="clima_user",
-        password="clima_pass",
+        host=host,
+        port=port,
+        dbname=os.getenv("POSTGRES_DB", "clima_brasil"),
+        user=os.getenv("POSTGRES_USER", "clima_user"),
+        password=os.getenv("POSTGRES_PASSWORD", "clima_pass"),
     )
 
 

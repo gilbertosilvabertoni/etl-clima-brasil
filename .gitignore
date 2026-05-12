@@ -21,3 +21,6 @@ docker/pgdata/
 # Abra o .gitignore e adicione ao final
 echo ".agents" >> .gitignore
 echo ".codex" >> .gitignore
+
+# Logs do Airflow
+logs/
