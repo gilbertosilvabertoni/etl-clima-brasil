@@ -18,9 +18,15 @@ docker/.env.db
 # Volume do PostgreSQL
 docker/pgdata/
 
-# Abra o .gitignore e adicione ao final
-echo ".agents" >> .gitignore
-echo ".codex" >> .gitignore
+# Ferramentas locais
+.agents/
+.codex/
 
 # Logs do Airflow
 logs/
+
+# Artefatos dbt
+dbt/logs/
+dbt/**/logs/
+dbt/**/target/
+dbt/**/dbt_packages/

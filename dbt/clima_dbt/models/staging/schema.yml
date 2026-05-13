@@ -1,0 +1,58 @@
+version: 2
+
+sources:
+  - name: clima_postgres
+    description: "Tabelas carregadas pelo pipeline Python/Airflow no PostgreSQL."
+    schema: public
+    tables:
+      - name: clima_diario
+        description: "Resumo diario de clima por cidade, gerado a partir dos dados horarios da Open-Meteo."
+        loaded_at_field: inserido_em
+        columns:
+          - name: id
+            description: "Identificador tecnico do registro carregado."
+            data_tests:
+              - unique
+              - not_null
+          - name: cidade
+            description: "Capital brasileira monitorada."
+            data_tests:
+              - not_null
+          - name: data
+            description: "Data do resumo diario."
+            data_tests:
+              - not_null
+
+models:
+  - name: stg_clima_diario
+    description: "Camada staging da tabela clima_diario com nomes padronizados e classificacao de chuva."
+    columns:
+      - name: clima_diario_id
+        description: "Chave primaria vinda da tabela operacional."
+        data_tests:
+          - unique
+          - not_null
+      - name: cidade
+        description: "Capital brasileira monitorada."
+        data_tests:
+          - not_null
+      - name: data_observacao
+        description: "Data do resumo diario."
+        data_tests:
+          - not_null
+      - name: temp_max_c
+        description: "Temperatura maxima diaria em graus Celsius."
+      - name: temp_min_c
+        description: "Temperatura minima diaria em graus Celsius."
+      - name: temp_media_c
+        description: "Temperatura media diaria em graus Celsius."
+      - name: chuva_total_mm
+        description: "Chuva acumulada no dia, em milimetros."
+      - name: vento_max_kmh
+        description: "Velocidade maxima do vento no dia, em km/h."
+      - name: classificacao_chuva
+        description: "Faixa simples de intensidade de chuva."
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['sem chuva', 'chuva leve', 'chuva forte']

@@ -1,5 +1,3 @@
-version: '3.8'
-
 x-airflow-common: &airflow-common
   image: apache/airflow:2.9.0
   env_file:
@@ -68,5 +66,19 @@ services:
     command: scheduler
     restart: always
 
+  dbt:
+    build:
+      context: .
+      dockerfile: Dockerfile.dbt
+    container_name: clima_dbt
+    volumes:
+      - ../dbt:/usr/app/dbt
+      - ../data:/usr/app/data
+    environment:
+      DBT_PROFILES_DIR: /usr/app/dbt
+    working_dir: /usr/app/dbt
+    depends_on:
+      postgres:
+        condition: service_healthy
 volumes:
   pgdata:

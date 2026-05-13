@@ -8,13 +8,22 @@ em banco PostgreSQL e disponibiliza consultas analíticas.
 - Python 3.x · Pandas · Requests · python-dotenv · psycopg2
 - PostgreSQL 16
 - Docker · Docker Compose
+- Airflow 2.9
+- dbt · dbt-postgres
 - Git/GitHub
 
 ## Estrutura
+```text
 etl-clima-brasil/
 ├── docker/
-│   ├── docker-compose.yml   # container PostgreSQL
+│   ├── docker-compose.yml   # containers PostgreSQL, Airflow, pgAdmin e dbt
+│   ├── Dockerfile.dbt       # imagem do dbt
 │   └── .env.db              # credenciais do banco
+├── dags/
+│   └── dag_clima_brasil.py  # orquestracao diaria no Airflow
+├── dbt/
+│   ├── profiles.yml         # conexao dbt com PostgreSQL
+│   └── clima_dbt/           # projeto dbt
 ├── sql/
 │   ├── 001_create_tables.sql      # schema da tabela
 │   └── 002_queries_analiticas.sql # consultas do cliente
@@ -29,6 +38,7 @@ etl-clima-brasil/
 ├── .env.example      # variáveis de ambiente necessárias
 ├── requirements.txt  # dependências do projeto
 └── README.md
+```
 
 ## Como rodar
 
@@ -46,7 +56,7 @@ pip install -r requirements.txt
 ### 4. Configure as variáveis de ambiente
 cp .env.example .env
 
-### 5. Suba o banco de dados
+### 5. Suba os containers
 cd docker
 docker compose up -d
 cd ..
@@ -57,9 +67,25 @@ python src/extract.py && python src/transform.py && python src/load.py
 ### 7. Carregue os dados no banco
 python src/database.py
 
-### 8. Consulte os dados
+### 8. Execute as transformações dbt
+```bash
+docker exec clima_dbt dbt debug --project-dir /usr/app/dbt/clima_dbt
+docker exec clima_dbt dbt run --project-dir /usr/app/dbt/clima_dbt
+docker exec clima_dbt dbt test --project-dir /usr/app/dbt/clima_dbt
+```
+
+### 9. Consulte os dados
+Consultas SQL originais:
+```bash
 docker exec clima_brasil_db psql -U clima_user -d clima_brasil \
   -c "$(cat sql/002_queries_analiticas.sql)"
+```
+
+Marts criados pelo dbt:
+```bash
+docker exec clima_brasil_db psql -U clima_user -d clima_brasil \
+  -c "select * from mart_clima_resumo_cidade order by media_temp_max_c desc;"
+```
 
 ## Dados coletados
 | Campo | Descrição |
@@ -81,6 +107,13 @@ São Paulo · Rio de Janeiro · Curitiba · Salvador · Manaus
 - Resumo semanal por cidade
 - Dias mais frios por cidade
 - Comparação entre cidades no dia mais recente
+
+## Modelos dbt
+- `stg_clima_diario`: padroniza a tabela `clima_diario`.
+- `mart_clima_resumo_cidade`: indicadores consolidados por cidade.
+- `mart_clima_resumo_semanal`: resumo semanal por cidade.
+- `mart_clima_ultimo_dia`: comparação das cidades no dia mais recente.
+- `mart_clima_alertas`: alertas de chuva forte, calor, frio e vento.
 
 ## Fonte dos dados
 [Open-Meteo](https://open-meteo.com/) — API meteorológica gratuita e aberta.

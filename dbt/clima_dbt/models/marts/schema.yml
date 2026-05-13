@@ -1,0 +1,60 @@
+version: 2
+
+models:
+  - name: mart_clima_resumo_cidade
+    description: "Resumo analitico por cidade para comparar temperatura, chuva e vento no periodo carregado."
+    columns:
+      - name: cidade
+        description: "Capital brasileira monitorada."
+        data_tests:
+          - unique
+          - not_null
+      - name: dias_coletados
+        description: "Quantidade de dias disponiveis para a cidade."
+        data_tests:
+          - not_null
+
+  - name: mart_clima_resumo_semanal
+    description: "Resumo semanal por cidade, pronto para relatorios executivos."
+    columns:
+      - name: cidade_semana_id
+        description: "Chave tecnica da cidade na semana."
+        data_tests:
+          - unique
+          - not_null
+      - name: cidade
+        data_tests:
+          - not_null
+      - name: inicio_semana
+        data_tests:
+          - not_null
+
+  - name: mart_clima_ultimo_dia
+    description: "Comparacao entre cidades no dia mais recente carregado."
+    columns:
+      - name: cidade
+        data_tests:
+          - unique
+          - not_null
+      - name: data_observacao
+        data_tests:
+          - not_null
+
+  - name: mart_clima_alertas
+    description: "Eventos climaticos relevantes para acompanhamento operacional."
+    columns:
+      - name: alerta_id
+        description: "Chave tecnica do alerta."
+        data_tests:
+          - unique
+          - not_null
+      - name: tipo_alerta
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['chuva_forte', 'calor_intenso', 'frio_intenso', 'vento_forte']
+      - name: severidade
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['media', 'alta']
